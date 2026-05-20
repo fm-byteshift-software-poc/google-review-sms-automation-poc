@@ -1,0 +1,15 @@
+# Core Framework
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+
+# Validation & Config
+pydantic>=2.7.0
+pydantic-settings>=2.2.0
+
+# Database
+sqlalchemy>=2.0.0
+
+# External Integrations
+twilio>=8.0.0
+resend>=1.0.0
+openai>=1.0.0
