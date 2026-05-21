@@ -1,46 +1,90 @@
 # Google Review Workflow PoC
 
-Backend API that automates review request **WhatsApp messages**, enforces contact suppression, handles satisfaction feedback, and generates AI-moderated review responses.
+Full-stack application that automates review request WhatsApp messages, enforces contact suppression, handles satisfaction feedback, and generates AI-moderated review responses.
 
 ## Tech Stack
 
+**Backend**
+
 - Python 3.12, FastAPI, SQLAlchemy 2.x, Pydantic v2
-- Twilio (WhatsApp API), Resend (Email), HuggingFace Router (LLM)
-- SQLite (Local persistence)
+- Twilio (WhatsApp API), Resend (Email), rule-based AI engine (LLM-ready)
+- SQLite (local persistence)
 
-## Setup
+**Frontend**
 
-1. Install dependencies: `pip install -r requirements.txt`
-2. Copy `.env.example` to `.env` and configure your credentials.
-3. Run the server: `uvicorn src.main:app --reload`
+- React 19, TypeScript, Vite
+- TailwindCSS 4, DaisyUI 5
+- React Router DOM, Lucide React icons
+
+## Quick Start
+
+### Backend
+
+```bash
+cd backend
+pip install -r requirements.txt
+cp .env.example .env  # configure your credentials
+uvicorn src.main:app --reload
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+cp .env.example .env  # set VITE_API_KEY
+npm run dev
+```
+
+Access the app at `http://localhost:3000`. The Vite proxy forwards `/api` requests to `http://localhost:8000`.
 
 ## Environment Variables
 
-| Variable                                                        | Description                                    |
-| --------------------------------------------------------------- | ---------------------------------------------- |
-| `API_KEY`                                                       | 12-character key for endpoint authentication   |
-| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER` | Twilio credentials (WhatsApp Sender ID)        |
-| `RESEND_API_KEY`, `RESEND_ALERT_EMAIL`                          | Resend email credentials                       |
-| `OPENAI_API_KEY`                                                | HuggingFace Router token (LLM)                 |
-| `GOOGLE_REVIEW_URL`                                             | Target Google review link                      |
-| `SUPPRESSION_WINDOW_DAYS`                                       | Days to block duplicate messages (default: 90) |
+### Backend (.env)
+
+| Variable                                                        | Description                                           |
+| --------------------------------------------------------------- | ----------------------------------------------------- |
+| `API_KEY`                                                       | 12-character key for endpoint authentication          |
+| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER` | Twilio WhatsApp credentials                           |
+| `RESEND_API_KEY`, `RESEND_ALERT_EMAIL`                          | Resend email credentials                              |
+| `GOOGLE_REVIEW_URL`                                             | Target Google review link (sent in WhatsApp messages) |
+| `SUPPRESSION_WINDOW_DAYS`                                       | Days to block duplicate messages (default: 90)        |
+
+### Frontend (.env)
+
+| Variable       | Description                                           |
+| -------------- | ----------------------------------------------------- |
+| `VITE_API_KEY` | Same 12-character key used for backend authentication |
 
 ## Testing
 
+**Backend API**
+
 - Open Swagger UI: `http://localhost:8000/docs`
-- Click **Authorize**, enter your 12-char `API_KEY`, and close the modal.
-- Use **Try it out** on any endpoint to execute requests.
+- Click **Authorize**, enter your `API_KEY`, and test endpoints directly
+
+**Frontend UI**
+
+- Navigate to `http://localhost:3000`
+- Use the Submissions tab to send WhatsApp requests
+- Use the Feedback tab to simulate customer responses
+- Use the AI Replies tab to generate moderated review responses
 
 ## Core Workflow
 
-1. **WhatsApp Request:** `POST /api/submissions` sends a WhatsApp message or blocks via 90-day suppression rule.
-2. **Feedback:** `POST /api/feedback` records satisfaction. `"no"` triggers an alert email via Resend.
-3. **AI Reply:** `POST /api/review-replies/generate` creates LLM responses with rule-based moderation (auto-approved for 4-5 stars, requires approval for 1-2 stars).
+1. **WhatsApp Request** (`POST /api/submissions`): Sends a WhatsApp message via Twilio or blocks via 90-day suppression rule. Phone numbers must use E.164 format with `whatsapp:` prefix (e.g., `whatsapp:+5521972501546`).
 
-## Notes
+2. **Feedback Recording** (`POST /api/feedback`): Staff manually records customer satisfaction after offline interaction. `"no"` triggers an automated alert email via Resend.
 
-- Twilio, Resend, and LLM services automatically fallback to simulation mode if credentials are missing.
-- SQLite database (`app.db`) and seed data are created automatically on first run.
+3. **AI Reply Generation** (`POST /api/review-replies/generate`): Creates contextual review responses with rule-based moderation: auto-approved for 4-5 stars, requires manual review for 1-2 stars.
+
+## Google Business Profile Integration Note
+
+This PoC does not integrate the Google Business Profile API. The `GOOGLE_REVIEW_URL` is included in WhatsApp messages as a direct link to your public review page. Customer interaction with the link happens outside the system. The Feedback tab simulates the outcome of that interaction for workflow validation. Production integration with Google Business Profile can be added once core logic is validated.
+
+## Simulation Mode
+
+Twilio, Resend, and LLM services automatically fallback to simulation mode if credentials are missing or invalid. This allows full workflow testing without external API dependencies during development.
 
 ---
 
