@@ -2,6 +2,18 @@
 
 Full-stack application that automates review request WhatsApp messages, enforces contact suppression, handles satisfaction feedback, and generates AI-moderated review responses.
 
+## Demo Videos
+
+Watch the complete workflow in action:
+
+**Satisfied customer flow**  
+https://assets.zyrosite.com/AQEZkE43zXtgRjLB/google-review-workflow-satisfied-9PpokublRdRY87qB.mp4
+
+**Dissatisfied customer flow**  
+https://assets.zyrosite.com/AQEZkE43zXtgRjLB/google-review-workflow-dissatisfied-tdROkTnjmHMdHqLt.mp4
+
+Both videos show the end-to-end PoC: WhatsApp message dispatch via Twilio, suppression rule handling, manual feedback recording via the Feedback tab, email alert triggering for dissatisfied customers, and AI-generated review replies with rule-based moderation.
+
 ## Tech Stack
 
 **Backend**
